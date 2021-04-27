@@ -9,6 +9,7 @@ import {
   assertType,
   booleanType,
   dictEntryType,
+  objectPathType,
   stringType,
   variantType,
 } from 'd-bus-type-system';
@@ -74,6 +75,14 @@ export class Adapter extends ProxyObject {
           )
       )
       .map(({objectPath}) => new Device(this.dBus, objectPath));
+  }
+
+  async removeDevice(device: Device): Promise<void> {
+    await this.callMethod(
+      'RemoveDevice',
+      [objectPathType],
+      [device.objectPath]
+    );
   }
 
   async startDiscovery(): Promise<void> {
