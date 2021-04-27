@@ -51,6 +51,12 @@ import {SystemDBus} from '@clebert/node-d-bus';
     }
 
     await adapter.setPowered(true);
+
+    await adapter.setDiscoveryFilter({
+      serviceUUIDs: ['xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'],
+      transport: 'le',
+    });
+
     await adapter.startDiscovery();
 
     let device;
