@@ -101,7 +101,7 @@ export class Adapter extends ProxyObject {
     );
   }
 
-  async getDiscovering(): Promise<boolean> {
+  async isDiscovering(): Promise<boolean> {
     const value = await this.getProperty('Discovering');
 
     assertType(booleanType, value);
@@ -109,7 +109,7 @@ export class Adapter extends ProxyObject {
     return value;
   }
 
-  async getPowered(): Promise<boolean> {
+  async isPowered(): Promise<boolean> {
     const value = await this.getProperty('Powered');
 
     assertType(booleanType, value);
