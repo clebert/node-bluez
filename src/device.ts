@@ -10,6 +10,11 @@ import {
 } from 'd-bus-type-system';
 import {GattCharacteristic} from './gatt-characteristic';
 
+export interface WaitForGattCharacteristicOptions {
+  /** Default: `50` */
+  readonly pollInterval?: number;
+}
+
 /**
  * https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/device-api.txt
  */
@@ -20,13 +25,18 @@ export class Device extends ProxyObject {
     super(dBus, 'org.bluez', objectPath, Device.interfaceName);
   }
 
-  async waitForGattCharacteristic(uuid: string): Promise<GattCharacteristic> {
+  async waitForGattCharacteristic(
+    uuid: string,
+    options: WaitForGattCharacteristicOptions = {}
+  ): Promise<GattCharacteristic> {
     let gattCharacteristic: GattCharacteristic | undefined;
 
     while (
       !(gattCharacteristic = (await this.getGattCharacteristics(uuid))[0])
     ) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) =>
+        setTimeout(resolve, options.pollInterval ?? 50)
+      );
     }
 
     return gattCharacteristic;

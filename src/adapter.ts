@@ -20,6 +20,14 @@ export interface DiscoveryFilter {
   readonly transport?: 'auto' | 'bredr' | 'le';
 }
 
+export interface WaitForDeviceOptions {
+  /** Default: `50` */
+  readonly pollInterval?: number;
+
+  /** Default: `false` */
+  readonly resolveServiceData?: boolean;
+}
+
 /**
  * https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt
  */
@@ -48,15 +56,17 @@ export class Adapter extends ProxyObject {
 
   async waitForDevice(
     address: string,
-    resolveServiceData?: boolean
+    options: WaitForDeviceOptions = {}
   ): Promise<Device> {
     let device: Device | undefined;
 
     while (
       !(device = (await this.getDevices(address))[0]) ||
-      (resolveServiceData && !(await device.getServiceData()))
+      (options.resolveServiceData && !(await device.getServiceData()))
     ) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) =>
+        setTimeout(resolve, options.pollInterval ?? 50)
+      );
     }
 
     return device;
