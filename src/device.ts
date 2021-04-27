@@ -73,18 +73,18 @@ export class Device extends ProxyObject {
     await this.callMethod('Disconnect');
   }
 
-  async getAddress(): Promise<string> {
-    const value = await this.getProperty('Address');
+  async isConnected(): Promise<boolean> {
+    const value = await this.getProperty('Connected');
 
-    assertType(stringType, value);
+    assertType(booleanType, value);
 
     return value;
   }
 
-  async getConnected(): Promise<boolean> {
-    const value = await this.getProperty('Connected');
+  async getAddress(): Promise<string> {
+    const value = await this.getProperty('Address');
 
-    assertType(booleanType, value);
+    assertType(stringType, value);
 
     return value;
   }
