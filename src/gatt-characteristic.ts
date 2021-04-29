@@ -1,8 +1,10 @@
 import {DBus, ProxyObject} from '@clebert/node-d-bus';
 import {
   arrayType,
+  assertType,
   dictEntryType,
   stringType,
+  structType,
   uint8Type,
   variantType,
 } from 'd-bus-type-system';
@@ -23,5 +25,17 @@ export class GattCharacteristic extends ProxyObject {
       [arrayType(uint8Type), arrayType(dictEntryType(stringType, variantType))],
       [bytes, [['type', [stringType, 'reliable']]]]
     );
+  }
+
+  async readValue(): Promise<readonly number[]> {
+    const {args} = await this.callMethod(
+      'ReadValue',
+      [arrayType(dictEntryType(stringType, variantType))],
+      [[]]
+    );
+
+    assertType(structType(arrayType(uint8Type)), args);
+
+    return args[0];
   }
 }
