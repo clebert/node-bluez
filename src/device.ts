@@ -70,11 +70,7 @@ export class Device extends ProxyObject {
           throw error;
         }
 
-        console.warn('Software caused connection abort.');
-
         await this.callMethod('Disconnect');
-
-        console.debug('Retry connect.');
       }
     }
   }
