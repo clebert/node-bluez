@@ -66,7 +66,12 @@ export class Device extends ProxyObject {
 
         return;
       } catch (error) {
-        if (error.message !== 'Software caused connection abort') {
+        const {message} = error;
+
+        if (
+          typeof message !== 'string' ||
+          !message.includes('Software caused connection abort')
+        ) {
           throw error;
         }
 
