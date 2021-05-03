@@ -22,7 +22,7 @@ context of home automation.
 ## Installation
 
 ```
-npm install @clebert/node-bluez
+npm install @clebert/node-bluez @clebert/node-d-bus
 ```
 
 ## Features
