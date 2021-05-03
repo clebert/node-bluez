@@ -14,6 +14,7 @@ import {
   variantType,
 } from 'd-bus-type-system';
 import {Device} from './device';
+import {Lock} from './lock';
 
 export interface DiscoveryFilter {
   readonly serviceUUIDs?: readonly string[];
@@ -21,12 +22,14 @@ export interface DiscoveryFilter {
 }
 
 export interface WaitForDeviceOptions {
-  /** Default: `50` */
+  /** Default: `50` milliseconds (ms) */
   readonly pollInterval?: number;
 
   /** Default: `false` */
   readonly resolveServiceData?: boolean;
 }
+
+const locks = new Map<string, Lock>();
 
 /**
  * https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt
@@ -52,6 +55,16 @@ export class Adapter extends ProxyObject {
 
   constructor(dBus: DBus, objectPath: string) {
     super(dBus, 'org.bluez', objectPath, Adapter.interfaceName);
+  }
+
+  get lock(): Lock {
+    const lock = locks.get(this.objectPath) ?? new Lock();
+
+    if (!locks.has(this.objectPath)) {
+      locks.set(this.objectPath, lock);
+    }
+
+    return lock;
   }
 
   async waitForDevice(
