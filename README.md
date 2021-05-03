@@ -34,7 +34,7 @@ npm install @clebert/node-bluez
 ## Usage example
 
 ```js
-import {Adapter, timeout} from '@clebert/node-bluez';
+import {Adapter} from '@clebert/node-bluez';
 import {SystemDBus} from '@clebert/node-d-bus';
 
 (async () => {
@@ -63,16 +63,15 @@ import {SystemDBus} from '@clebert/node-d-bus';
     let device;
 
     try {
-      device = await timeout(adapter.waitForDevice('XX:XX:XX:XX:XX:XX'), 5000);
+      device = await adapter.waitForDevice('XX:XX:XX:XX:XX:XX');
     } finally {
       await adapter.stopDiscovery();
     }
 
-    await timeout(device.connect(), 5000);
+    await device.connect();
 
-    const gattCharacteristic = await timeout(
-      device.waitForGattCharacteristic('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'),
-      5000
+    const gattCharacteristic = await device.waitForGattCharacteristic(
+      'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
     );
 
     await gattCharacteristic.writeValue([
