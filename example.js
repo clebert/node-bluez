@@ -17,36 +17,42 @@ import {Adapter} from './lib/cjs';
       throw new Error('Adapter not found.');
     }
 
-    await adapter.setPowered(true);
-
-    await adapter.setDiscoveryFilter({
-      serviceUUIDs: ['xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'],
-      transport: 'le',
-    });
-
-    await adapter.startDiscovery();
-
-    let device;
+    const unlockAdapter = await adapter.lock.aquire();
 
     try {
-      device = await adapter.waitForDevice('XX:XX:XX:XX:XX:XX');
+      await adapter.setPowered(true);
+
+      await adapter.setDiscoveryFilter({
+        serviceUUIDs: ['xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'],
+        transport: 'le',
+      });
+
+      await adapter.startDiscovery();
+
+      let device;
+
+      try {
+        device = await adapter.waitForDevice('XX:XX:XX:XX:XX:XX');
+      } finally {
+        await adapter.stopDiscovery();
+      }
+
+      await device.connect();
+
+      const gattCharacteristic = await device.waitForGattCharacteristic(
+        'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+      );
+
+      await gattCharacteristic.writeValue([
+        'f'.charCodeAt(0),
+        'o'.charCodeAt(0),
+        'o'.charCodeAt(0),
+      ]);
+
+      await device.disconnect();
     } finally {
-      await adapter.stopDiscovery();
+      unlockAdapter();
     }
-
-    await device.connect();
-
-    const gattCharacteristic = await device.waitForGattCharacteristic(
-      'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-    );
-
-    await gattCharacteristic.writeValue([
-      'f'.charCodeAt(0),
-      'o'.charCodeAt(0),
-      'o'.charCodeAt(0),
-    ]);
-
-    await device.disconnect();
   } finally {
     dBus.disconnect();
   }
