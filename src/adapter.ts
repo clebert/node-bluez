@@ -3,6 +3,7 @@ import {
   MemberElement,
   ObjectElement,
   ProxyObject,
+  SystemDBus,
 } from '@clebert/node-d-bus';
 import {
   arrayType,
@@ -51,6 +52,35 @@ export class Adapter extends ProxyObject {
         )
       )
       .map(({objectPath}) => new Adapter(dBus, objectPath));
+  }
+
+  static async use<TResult>(
+    operation: (adapter: Adapter) => Promise<TResult>,
+    address?: string
+  ): Promise<TResult> {
+    const dBus = new SystemDBus();
+
+    await dBus.connectAsExternal();
+
+    try {
+      await dBus.hello();
+
+      const [adapter] = await Adapter.getAll(dBus, address);
+
+      if (!adapter) {
+        throw new Error('Adapter not found.');
+      }
+
+      const unlockAdapter = await adapter.lock.aquire();
+
+      try {
+        return await operation(adapter);
+      } finally {
+        unlockAdapter();
+      }
+    } finally {
+      dBus.disconnect();
+    }
   }
 
   constructor(dBus: DBus, objectPath: string) {

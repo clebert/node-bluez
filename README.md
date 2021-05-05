@@ -16,8 +16,9 @@
 
 This package runs only on Linux and has a very limited feature set. It is
 specially designed for controlling simple BLE devices (e.g.
-[@clebert/node-switch-bot](https://github.com/clebert/node-switch-bot)) in the
-context of home automation.
+[@clebert/node-switch-bot](https://github.com/clebert/node-switch-bot) and
+[@clebert/node-plant-sensor](https://github.com/clebert/node-plant-sensor)) in
+the context of home automation.
 
 ## Installation
 
