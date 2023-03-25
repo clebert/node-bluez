@@ -1,6 +1,6 @@
 {
   "name": "@clebert/node-bluez",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "A Node.js API for BlueZ with native TypeScript support.",
   "repository": {
     "type": "git",
