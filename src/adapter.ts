@@ -1,5 +1,5 @@
+import type {DBus} from '@clebert/node-d-bus';
 import {
-  DBus,
   MemberElement,
   ObjectElement,
   ProxyObject,
@@ -14,8 +14,8 @@ import {
   stringType,
   variantType,
 } from 'd-bus-type-system';
-import {Device} from './device';
-import {Lock} from './lock';
+import {Device} from './device.js';
+import {Lock} from './lock.js';
 
 export interface DiscoveryFilter {
   readonly serviceUUIDs?: readonly string[];
@@ -36,27 +36,27 @@ const locks = new Map<string, Lock>();
  * https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt
  */
 export class Adapter extends ProxyObject {
-  static readonly interfaceName = 'org.bluez.Adapter1';
+  static readonly interfaceName = `org.bluez.Adapter1`;
 
   static async getAll(
     dBus: DBus,
-    address?: string
+    address?: string,
   ): Promise<readonly Adapter[]> {
-    const objectElements = await ObjectElement.getAll(dBus, 'org.bluez');
+    const objectElements = await ObjectElement.getAll(dBus, `org.bluez`);
 
     return objectElements
       .filter((objectElement) =>
         objectElement.hasInterface(
           Adapter.interfaceName,
-          address ? new MemberElement('Address', address) : undefined
-        )
+          address ? new MemberElement(`Address`, address) : undefined,
+        ),
       )
       .map(({objectPath}) => new Adapter(dBus, objectPath));
   }
 
   static async use<TResult>(
     operation: (adapter: Adapter) => Promise<TResult>,
-    address?: string
+    address?: string,
   ): Promise<TResult> {
     const dBus = new SystemDBus();
 
@@ -68,7 +68,7 @@ export class Adapter extends ProxyObject {
       const [adapter] = await Adapter.getAll(dBus, address);
 
       if (!adapter) {
-        throw new Error('Adapter not found.');
+        throw new Error(`Adapter not found.`);
       }
 
       const unlockAdapter = await adapter.lock.aquire();
@@ -84,7 +84,7 @@ export class Adapter extends ProxyObject {
   }
 
   constructor(dBus: DBus, objectPath: string) {
-    super(dBus, 'org.bluez', objectPath, Adapter.interfaceName);
+    super(dBus, `org.bluez`, objectPath, Adapter.interfaceName);
   }
 
   get lock(): Lock {
@@ -99,7 +99,7 @@ export class Adapter extends ProxyObject {
 
   async waitForDevice(
     address: string,
-    options: WaitForDeviceOptions = {}
+    options: WaitForDeviceOptions = {},
   ): Promise<Device> {
     let device: Device | undefined;
 
@@ -108,7 +108,7 @@ export class Adapter extends ProxyObject {
       (options.resolveServiceData && !(await device.getServiceData()))
     ) {
       await new Promise((resolve) =>
-        setTimeout(resolve, options.pollInterval ?? 50)
+        setTimeout(resolve, options.pollInterval ?? 50),
       );
     }
 
@@ -124,47 +124,47 @@ export class Adapter extends ProxyObject {
           objectElement.objectPath.startsWith(this.objectPath) &&
           objectElement.hasInterface(
             Device.interfaceName,
-            address ? new MemberElement('Address', address) : undefined
-          )
+            address ? new MemberElement(`Address`, address) : undefined,
+          ),
       )
       .map(({objectPath}) => new Device(this.dBus, objectPath));
   }
 
   async removeDevice(device: Device): Promise<void> {
     await this.callMethod(
-      'RemoveDevice',
+      `RemoveDevice`,
       [objectPathType],
-      [device.objectPath]
+      [device.objectPath],
     );
   }
 
   async startDiscovery(): Promise<void> {
-    await this.callMethod('StartDiscovery');
+    await this.callMethod(`StartDiscovery`);
   }
 
   async stopDiscovery(): Promise<void> {
-    await this.callMethod('StopDiscovery');
+    await this.callMethod(`StopDiscovery`);
   }
 
   async setDiscoveryFilter(filter: DiscoveryFilter = {}): Promise<void> {
     await this.callMethod(
-      'SetDiscoveryFilter',
+      `SetDiscoveryFilter`,
       [arrayType(dictEntryType(stringType, variantType))],
       [
         [
           ...(filter.serviceUUIDs
-            ? [['UUIDs', [arrayType(stringType), filter.serviceUUIDs]]]
+            ? [[`UUIDs`, [arrayType(stringType), filter.serviceUUIDs]]]
             : []),
           ...(filter.transport
-            ? [['Transport', [stringType, filter.transport]]]
+            ? [[`Transport`, [stringType, filter.transport]]]
             : []),
         ],
-      ]
+      ],
     );
   }
 
   async isDiscovering(): Promise<boolean> {
-    const value = await this.getProperty('Discovering');
+    const value = await this.getProperty(`Discovering`);
 
     assertType(booleanType, value);
 
@@ -172,7 +172,7 @@ export class Adapter extends ProxyObject {
   }
 
   async isPowered(): Promise<boolean> {
-    const value = await this.getProperty('Powered');
+    const value = await this.getProperty(`Powered`);
 
     assertType(booleanType, value);
 
@@ -180,6 +180,6 @@ export class Adapter extends ProxyObject {
   }
 
   async setPowered(value: boolean): Promise<void> {
-    await this.setProperty('Powered', booleanType, value);
+    await this.setProperty(`Powered`, booleanType, value);
   }
 }

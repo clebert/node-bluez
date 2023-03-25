@@ -1,17 +1,5 @@
 # Node.js BlueZ
 
-[![][ci-badge]][ci-link] [![][version-badge]][version-link]
-[![][license-badge]][license-link] [![][types-badge]][types-link]
-
-[ci-badge]: https://github.com/clebert/node-bluez/workflows/CI/badge.svg
-[ci-link]: https://github.com/clebert/node-bluez
-[version-badge]: https://badgen.net/npm/v/@clebert/node-bluez
-[version-link]: https://www.npmjs.com/package/@clebert/node-bluez
-[license-badge]: https://badgen.net/npm/license/@clebert/node-bluez
-[license-link]: https://github.com/clebert/node-bluez/blob/master/LICENSE
-[types-badge]: https://badgen.net/npm/types/@clebert/node-bluez
-[types-link]: https://github.com/clebert/node-bluez
-
 > A Node.js API for BlueZ with native TypeScript support.
 
 This package runs only on Linux and has a very limited feature set. It is
@@ -49,7 +37,7 @@ import {SystemDBus} from '@clebert/node-d-bus';
     const [adapter] = await Adapter.getAll(dBus);
 
     if (!adapter) {
-      throw new Error('Adapter not found.');
+      throw new Error(`Adapter not found.`);
     }
 
     const unlockAdapter = await adapter.lock.aquire();
@@ -58,8 +46,8 @@ import {SystemDBus} from '@clebert/node-d-bus';
       await adapter.setPowered(true);
 
       await adapter.setDiscoveryFilter({
-        serviceUUIDs: ['xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'],
-        transport: 'le',
+        serviceUUIDs: [`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`],
+        transport: `le`,
       });
 
       await adapter.startDiscovery();
@@ -67,7 +55,7 @@ import {SystemDBus} from '@clebert/node-d-bus';
       let device;
 
       try {
-        device = await adapter.waitForDevice('XX:XX:XX:XX:XX:XX');
+        device = await adapter.waitForDevice(`XX:XX:XX:XX:XX:XX`);
       } finally {
         await adapter.stopDiscovery();
       }
@@ -75,13 +63,13 @@ import {SystemDBus} from '@clebert/node-d-bus';
       await device.connect();
 
       const gattCharacteristic = await device.waitForGattCharacteristic(
-        'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+        `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`,
       );
 
       await gattCharacteristic.writeValue([
-        'f'.charCodeAt(0),
-        'o'.charCodeAt(0),
-        'o'.charCodeAt(0),
+        `f`.charCodeAt(0),
+        `o`.charCodeAt(0),
+        `o`.charCodeAt(0),
       ]);
 
       await device.disconnect();
@@ -117,8 +105,3 @@ username may need to be modified.
   </policy>
 </busconfig>
 ```
-
----
-
-Copyright (c) 2021, Clemens Akens. Released under the terms of the
-[MIT License](https://github.com/clebert/node-bluez/blob/master/LICENSE).

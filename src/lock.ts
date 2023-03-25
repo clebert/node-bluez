@@ -1,7 +1,6 @@
 export class Lock {
-  readonly #queue: ((
-    value: (() => void) | PromiseLike<() => void>
-  ) => void)[] = [];
+  readonly #queue: ((value: (() => void) | PromiseLike<() => void>) => void)[] =
+    [];
 
   #aquired = false;
 

@@ -1,4 +1,5 @@
-import {DBus, MemberElement, ProxyObject} from '@clebert/node-d-bus';
+import type {DBus} from '@clebert/node-d-bus';
+import {MemberElement, ProxyObject} from '@clebert/node-d-bus';
 import {
   arrayType,
   assertType,
@@ -8,7 +9,7 @@ import {
   uint8Type,
   variantType,
 } from 'd-bus-type-system';
-import {GattCharacteristic} from './gatt-characteristic';
+import {GattCharacteristic} from './gatt-characteristic.js';
 
 export interface WaitForGattCharacteristicOptions {
   /** Default: `50` */
@@ -19,15 +20,15 @@ export interface WaitForGattCharacteristicOptions {
  * https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/device-api.txt
  */
 export class Device extends ProxyObject {
-  static readonly interfaceName = 'org.bluez.Device1';
+  static readonly interfaceName = `org.bluez.Device1`;
 
   constructor(dBus: DBus, objectPath: string) {
-    super(dBus, 'org.bluez', objectPath, Device.interfaceName);
+    super(dBus, `org.bluez`, objectPath, Device.interfaceName);
   }
 
   async waitForGattCharacteristic(
     uuid: string,
-    options: WaitForGattCharacteristicOptions = {}
+    options: WaitForGattCharacteristicOptions = {},
   ): Promise<GattCharacteristic> {
     let gattCharacteristic: GattCharacteristic | undefined;
 
@@ -35,7 +36,7 @@ export class Device extends ProxyObject {
       !(gattCharacteristic = (await this.getGattCharacteristics(uuid))[0])
     ) {
       await new Promise((resolve) =>
-        setTimeout(resolve, options.pollInterval ?? 50)
+        setTimeout(resolve, options.pollInterval ?? 50),
       );
     }
 
@@ -43,7 +44,7 @@ export class Device extends ProxyObject {
   }
 
   async getGattCharacteristics(
-    uuid?: string
+    uuid?: string,
   ): Promise<readonly GattCharacteristic[]> {
     const objectElements = await this.getObjectElements();
 
@@ -53,8 +54,8 @@ export class Device extends ProxyObject {
           objectElement.objectPath.startsWith(this.objectPath) &&
           objectElement.hasInterface(
             GattCharacteristic.interfaceName,
-            uuid ? new MemberElement('UUID', uuid) : undefined
-          )
+            uuid ? new MemberElement(`UUID`, uuid) : undefined,
+          ),
       )
       .map(({objectPath}) => new GattCharacteristic(this.dBus, objectPath));
   }
@@ -62,25 +63,28 @@ export class Device extends ProxyObject {
   async connect(): Promise<void> {
     while (true) {
       try {
-        await this.callMethod('Connect');
+        await this.callMethod(`Connect`);
 
         return;
       } catch (error) {
-        if (!error.message.includes('Software caused connection abort')) {
+        if (
+          error instanceof Error &&
+          !error.message.includes(`Software caused connection abort`)
+        ) {
           throw error;
         }
 
-        await this.callMethod('Disconnect');
+        await this.callMethod(`Disconnect`);
       }
     }
   }
 
   async disconnect(): Promise<void> {
-    await this.callMethod('Disconnect');
+    await this.callMethod(`Disconnect`);
   }
 
   async isConnected(): Promise<boolean> {
-    const value = await this.getProperty('Connected');
+    const value = await this.getProperty(`Connected`);
 
     assertType(booleanType, value);
 
@@ -88,7 +92,7 @@ export class Device extends ProxyObject {
   }
 
   async getAddress(): Promise<string> {
-    const value = await this.getProperty('Address');
+    const value = await this.getProperty(`Address`);
 
     assertType(stringType, value);
 
@@ -98,7 +102,7 @@ export class Device extends ProxyObject {
   async getServiceData(): Promise<
     Readonly<Record<string, readonly number[]>> | undefined
   > {
-    const value = await this.getProperty('ServiceData');
+    const value = await this.getProperty(`ServiceData`);
 
     if (value === undefined) {
       return undefined;

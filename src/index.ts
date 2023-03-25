@@ -1,3 +1,3 @@
-export * from './adapter';
-export * from './device';
-export * from './gatt-characteristic';
+export * from './adapter.js';
+export * from './device.js';
+export * from './gatt-characteristic.js';
