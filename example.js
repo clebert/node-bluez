@@ -1,5 +1,5 @@
-import {SystemDBus} from '@clebert/node-d-bus';
 import {Adapter} from './lib/index.js';
+import {SystemDBus} from '@clebert/node-d-bus';
 
 const dBus = new SystemDBus();
 

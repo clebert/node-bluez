@@ -1,4 +1,5 @@
 import type {DBus} from '@clebert/node-d-bus';
+
 import {ProxyObject} from '@clebert/node-d-bus';
 import {
   arrayType,

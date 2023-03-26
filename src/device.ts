@@ -1,4 +1,6 @@
 import type {DBus} from '@clebert/node-d-bus';
+
+import {GattCharacteristic} from './gatt-characteristic.js';
 import {MemberElement, ProxyObject} from '@clebert/node-d-bus';
 import {
   arrayType,
@@ -9,7 +11,6 @@ import {
   uint8Type,
   variantType,
 } from 'd-bus-type-system';
-import {GattCharacteristic} from './gatt-characteristic.js';
 
 export interface WaitForGattCharacteristicOptions {
   /** Default: `50` */

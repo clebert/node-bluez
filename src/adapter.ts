@@ -1,4 +1,7 @@
 import type {DBus} from '@clebert/node-d-bus';
+
+import {Device} from './device.js';
+import {Lock} from './lock.js';
 import {
   MemberElement,
   ObjectElement,
@@ -14,8 +17,6 @@ import {
   stringType,
   variantType,
 } from 'd-bus-type-system';
-import {Device} from './device.js';
-import {Lock} from './lock.js';
 
 export interface DiscoveryFilter {
   readonly serviceUUIDs?: readonly string[];
