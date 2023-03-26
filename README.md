@@ -18,7 +18,6 @@ npm install @clebert/node-bluez @clebert/node-d-bus
 
 - Designed from the ground up with TypeScript.
 - Uses a solid and well-tested D-Bus implementation to communicate with BlueZ.
-- Tested with Node.js 14 on Raspberry Pi OS Lite.
 
 ## Usage example
 
